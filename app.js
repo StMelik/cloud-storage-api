@@ -2,12 +2,22 @@ const express = require('express')
 const mongoose = require('mongoose')
 const config = require('config')
 const authRouter = require('./routes/auth.routes')
+const cors = require('cors')
 
 const PORT = config.get('serverPort')
 const app = express()
 
+app.use(cors())
+
+// app.use(cors({
+//     origin: 'http://localhost:3000',
+//     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+//     allowedHeaders: ['Content-Type']
+// }))
+
 app.use(express.json())
 app.use('/', authRouter)
+
 
 
 const start = async () => {
