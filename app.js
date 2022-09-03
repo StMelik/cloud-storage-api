@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const config = require('config')
 const authRouter = require('./routes/auth.routes')
+const filesRouter = require('./routes/file.routes')
 const cors = require('cors')
 
 const PORT = config.get('serverPort')
@@ -17,6 +18,7 @@ app.use(cors())
 
 app.use(express.json())
 app.use('/', authRouter)
+app.use('/files', filesRouter)
 
 
 
