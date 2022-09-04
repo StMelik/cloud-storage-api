@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const config = require('config')
 const authRouter = require('./routes/auth.routes')
 const filesRouter = require('./routes/file.routes')
+const fileUpload = require('express-fileupload')
 const cors = require('cors')
 
 const PORT = config.get('serverPort')
@@ -16,6 +17,7 @@ app.use(cors())
 //     allowedHeaders: ['Content-Type']
 // }))
 
+app.use(fileUpload({}))
 app.use(express.json())
 app.use('/', authRouter)
 app.use('/files', filesRouter)
