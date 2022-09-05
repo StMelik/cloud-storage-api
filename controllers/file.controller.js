@@ -72,11 +72,16 @@ class FileController {
 
             const type = file.name.split('.').pop()
 
+            let filePathDb = file.name
+            if (parent) {
+                filePathDb = path.join(parent.path, file.name)
+            }
+
             const dbFile = new File({
                 name: file.name,
                 type,
                 size: file.size,
-                path: parent?.path,
+                path: filePathDb,
                 parent: parent?._id,
                 user: user._id,
             })
@@ -95,7 +100,7 @@ class FileController {
     async downloadFile(req, res) {
         try {
             const file = await File.findOne({ _id: req.query.id, user: req.user.id })
-            const filePath = path.resolve('./files', String(req.user.id), file.path, file.name)
+            const filePath = path.resolve('./files', String(req.user.id), file.path)
 
             if (fs.existsSync(filePath)) {
                 return res.download(filePath, file.name)
@@ -104,6 +109,23 @@ class FileController {
         } catch (e) {
             console.log(e);
             return res.status(500).json({ message: 'Ошибка при скачивании файла' })
+        }
+    }
+
+    async deleteFile(req, res) {
+        try {
+            const file = await File.findOne({ _id: req.query.id, user: req.user.id })
+            if (!file) {
+                return res.status(400).json({ message: 'Файл не существует' })
+            }
+
+            fileService.deleteFile(file)
+            await file.remove()
+
+            return res.json({ message: 'Файл был удален' })
+        } catch (e) {
+            console.log(e);
+            return res.status(500).json({ message: 'Ошибка при удалении файла. В папке есть файлы' })
         }
     }
 }
