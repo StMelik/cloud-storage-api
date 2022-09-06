@@ -25,7 +25,7 @@ const registration = async (req, res) => {
         const hashPassword = await bcrypt.hash(password, 10)
         const user = await User.create({ email, password: hashPassword })
 
-        await fileService.createDir(new File({ user: user.id, name: '' }))
+        await fileService.createDir(req, new File({ user: user.id, name: '' }))
 
         return res.json({ message: 'Пользователь создан' })
     } catch (e) {

@@ -3,10 +3,8 @@ const File = require('../models/File')
 const path = require('path')
 
 class FileService {
-
-    createDir(file) {
-
-        const filePath = path.resolve('./files', String(file.user), file.path)
+    createDir(req, file) {
+        const filePath = this.getPath(req, file)
 
         return new Promise((resolve, reject) => {
             try {
@@ -16,15 +14,14 @@ class FileService {
                 } else {
                     return reject({ message: 'Файл уже существует' })
                 }
-
             } catch (e) {
                 return reject({ message: 'Ошибка при созданиии папки' })
             }
         })
     }
 
-    deleteFile(file) {
-        const filePath = this.getPath(file)
+    deleteFile(req, file) {
+        const filePath = this.getPath(req, file)
 
         if (file.type === 'dir') {
             fs.rmdirSync(filePath)
@@ -33,8 +30,8 @@ class FileService {
         }
     }
 
-    getPath(file) {
-        return path.resolve('./files', String(file.user), file.path)
+    getPath(req, file) {
+        return path.join(req.filePath, String(file.user), file.path)
     }
 }
 

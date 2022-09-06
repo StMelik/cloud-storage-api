@@ -7,20 +7,18 @@ const uuid = require('uuid')
 
 
 class FileController {
-
     async createDir(req, res) {
         try {
-
             const { name, type, parent } = req.body
             const file = new File({ name, type, parent, user: req.user.id })
             const parentFile = await File.findById(parent)
 
             if (!parentFile) {
                 file.path = name
-                await fileService.createDir(file)
+                await fileService.createDir(req, file)
             } else {
                 file.path = path.join(parentFile.path, file.name)
-                await fileService.createDir(file)
+                await fileService.createDir(req, file)
                 parentFile.childs.push(file._id)
                 await parentFile.save()
             }
@@ -75,9 +73,9 @@ class FileController {
 
             let filePath;
             if (parent) {
-                filePath = path.resolve('./files', String(user._id), parent.path, file.name)
+                filePath = path.join(req.filePath, String(user._id), parent.path, file.name)
             } else {
-                filePath = path.resolve('./files', String(user._id), file.name)
+                filePath = path.join(req.filePath, String(user._id), file.name)
             }
 
             if (fs.existsSync(filePath)) {
@@ -98,7 +96,7 @@ class FileController {
                 type,
                 size: file.size,
                 path: filePathDb,
-                parent: parent?._id,
+                parent: parent ? parent._id : null,
                 user: user._id,
             })
 
@@ -116,7 +114,7 @@ class FileController {
     async downloadFile(req, res) {
         try {
             const file = await File.findOne({ _id: req.query.id, user: req.user.id })
-            const filePath = fileService.getPath(file)
+            const filePath = fileService.getPath(req, file)
 
             if (fs.existsSync(filePath)) {
                 return res.download(filePath, file.name)
@@ -135,7 +133,7 @@ class FileController {
                 return res.status(400).json({ message: 'Файл не существует' })
             }
 
-            fileService.deleteFile(file)
+            fileService.deleteFile(req, file)
             await file.remove()
 
             return res.json({ message: 'Файл был удален' })
@@ -165,7 +163,7 @@ class FileController {
             const user = await User.findById(req.user.id)
             const avatarName = uuid.v4() + '.jpg'
 
-            file.mv(path.resolve('./static', avatarName))
+            file.mv(path.resolve(__dirname, 'static', avatarName))
 
             user.avatar = avatarName
             await user.save()
@@ -181,12 +179,8 @@ class FileController {
         try {
             const user = await User.findById(req.user.id)
 
-            fs.unlinkSync(path.resolve('./static', user.avatar))
+            fs.unlinkSync(path.resolve(__dirname, 'static', user.avatar))
             user.avatar = null
-
-
-
-
 
             await user.save()
 
