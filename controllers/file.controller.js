@@ -143,6 +143,20 @@ class FileController {
             return res.status(500).json({ message: 'Ошибка при удалении файла. В папке есть файлы' })
         }
     }
+
+    async searchFile(req, res) {
+        try {
+            const searchQuery = req.query.search
+            let files = await File.find({ user: req.user.id })
+
+            files = files.filter(file => file.name.includes(searchQuery))
+
+            return res.json(files)
+        } catch (e) {
+            console.log(e);
+            return res.status(500).json({ message: 'Ошибка при поиске файлов' })
+        }
+    }
 }
 
 module.exports = new FileController()
