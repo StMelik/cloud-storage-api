@@ -3,6 +3,7 @@ const User = require('../models/User')
 const File = require('../models/File')
 const path = require('path')
 const fs = require('fs')
+const uuid = require('uuid')
 
 
 class FileController {
@@ -155,6 +156,44 @@ class FileController {
         } catch (e) {
             console.log(e);
             return res.status(500).json({ message: 'Ошибка при поиске файлов' })
+        }
+    }
+
+    async uploadAvatar(req, res) {
+        try {
+            const file = req.files.file
+            const user = await User.findById(req.user.id)
+            const avatarName = uuid.v4() + '.jpg'
+
+            file.mv(path.resolve('./static', avatarName))
+
+            user.avatar = avatarName
+            await user.save()
+
+            return res.json(user)
+        } catch (e) {
+            console.log(e);
+            return res.status(500).json({ message: 'Ошибка при загрузке аватара' })
+        }
+    }
+
+    async deleteAvatar(req, res) {
+        try {
+            const user = await User.findById(req.user.id)
+
+            fs.unlinkSync(path.resolve('./static', user.avatar))
+            user.avatar = null
+
+
+
+
+
+            await user.save()
+
+            return res.json(user)
+        } catch (e) {
+            console.log(e);
+            return res.status(500).json({ message: 'Ошибка при удалении аватара' })
         }
     }
 }
