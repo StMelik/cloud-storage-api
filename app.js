@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express')
 const mongoose = require('mongoose')
 const config = require('config')
@@ -6,7 +7,7 @@ const filesRouter = require('./routes/file.routes')
 const fileUpload = require('express-fileupload')
 const cors = require('cors')
 
-const PORT = config.get('serverPort')
+const PORT = process.env.PORT || config.get('serverPort')
 const app = express()
 
 app.use(cors())
