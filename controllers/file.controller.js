@@ -163,7 +163,13 @@ class FileController {
             const user = await User.findById(req.user.id)
             const avatarName = uuid.v4() + '.jpg'
 
-            file.mv(path.resolve(__dirname, 'static', avatarName))
+            const pathStatic = path.resolve(__dirname, '..', 'static')
+
+            if (!fs.existsSync(pathStatic)) {
+                fs.mkdirSync(pathStatic)
+            }
+
+            file.mv(path.resolve(__dirname, "..", 'static', avatarName))
 
             user.avatar = avatarName
             await user.save()
@@ -179,7 +185,7 @@ class FileController {
         try {
             const user = await User.findById(req.user.id)
 
-            fs.unlinkSync(path.resolve(__dirname, 'static', user.avatar))
+            fs.unlinkSync(path.resolve(__dirname, '..', 'static', user.avatar))
             user.avatar = null
 
             await user.save()

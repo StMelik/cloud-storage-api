@@ -12,13 +12,14 @@ const filePath = require('./middlewares/path.middleware')
 const PORT = process.env.PORT || config.get('serverPort')
 const app = express()
 
-// app.use(cors())
+app.use(cors())
 
-app.use(cors({
-    origin: 'https://symphonious-profiterole-600158.netlify.app',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}))
+// app.use(cors({
+//     origin: 'https://symphonious-profiterole-600158.netlify.app',
+//     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }))
+
 app.use(filePath(path.resolve(__dirname, 'files')))
 
 app.use(fileUpload({}))

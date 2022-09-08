@@ -2,6 +2,7 @@ const User = require('../models/User')
 const bcrypt = require('bcryptjs')
 const config = require('config')
 const jwt = require('jsonwebtoken')
+const fs = require('fs')
 const { validationResult } = require('express-validator')
 const fileService = require('../services/fileService')
 const File = require('../models/File')
@@ -25,7 +26,11 @@ const registration = async (req, res) => {
         const hashPassword = await bcrypt.hash(password, 10)
         const user = await User.create({ email, password: hashPassword })
 
-        await fileService.createDir(req, new File({ user: user.id, name: '' }))
+        if (!fs.existsSync(req.filePath)) {
+            fs.mkdirSync(req.filePath)
+        }
+
+        await fileService.createDir(req, new File({ user: user._id, name: '' }))
 
         return res.json({ message: 'Пользователь создан' })
     } catch (e) {
