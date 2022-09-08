@@ -5,7 +5,6 @@ const path = require('path')
 const fs = require('fs')
 const uuid = require('uuid')
 
-
 class FileController {
     async createDir(req, res) {
         try {
@@ -14,7 +13,7 @@ class FileController {
             const parentFile = await File.findById(parent)
 
             if (!parentFile) {
-                file.path = name
+                file.path = file.name
                 await fileService.createDir(req, file)
             } else {
                 file.path = path.join(parentFile.path, file.name)
@@ -24,11 +23,11 @@ class FileController {
             }
 
             await file.save()
-            return res.json(file)
+
+            return res.status(201).json(file)
 
         } catch (e) {
-            console.log(e);
-            return res.status(500).json(e)
+            return res.status(500).json({ message: "Ошибка при создании папки", e })
         }
     }
 
@@ -54,8 +53,7 @@ class FileController {
             return res.json(files)
 
         } catch (e) {
-            console.log(e);
-            return res.status(500).json(e)
+            return res.status(500).json({ message: "Ошибка при получении файлов", e })
         }
     }
 
@@ -66,12 +64,13 @@ class FileController {
             const user = await User.findById(req.user.id)
 
             if (user.usedSpace + file.size > user.diskSpace) {
-                return res.status(400).json({ message: 'Недостаточно места на диске' })
+                return res.status(409).json({ message: 'Недостаточно места на диске' })
             }
 
             user.usedSpace += file.size
 
             let filePath;
+
             if (parent) {
                 filePath = path.join(req.filePath, String(user._id), parent.path, file.name)
             } else {
@@ -79,7 +78,7 @@ class FileController {
             }
 
             if (fs.existsSync(filePath)) {
-                return res.status(400).json({ message: 'Такой файл уже существует' })
+                return res.status(409).json({ message: 'Такой файл уже существует' })
             }
 
             file.mv(filePath)
@@ -103,11 +102,10 @@ class FileController {
             await dbFile.save()
             await user.save()
 
-            res.json(dbFile)
+            res.status(201).json(dbFile)
 
         } catch (e) {
-            console.log(e);
-            return res.status(500).json({ message: 'Ошибка при загрузке файла' })
+            return res.status(500).json({ message: 'Ошибка при загрузке файла', e })
         }
     }
 
@@ -121,8 +119,7 @@ class FileController {
             }
 
         } catch (e) {
-            console.log(e);
-            return res.status(500).json({ message: 'Ошибка при скачивании файла' })
+            return res.status(500).json({ message: 'Ошибка при скачивании файла', e })
         }
     }
 
@@ -130,7 +127,7 @@ class FileController {
         try {
             const file = await File.findOne({ _id: req.query.id, user: req.user.id })
             if (!file) {
-                return res.status(400).json({ message: 'Файл не существует' })
+                return res.status(410).json({ message: 'Файл не существует' })
             }
 
             fileService.deleteFile(req, file)
@@ -138,8 +135,7 @@ class FileController {
 
             return res.json({ message: 'Файл был удален' })
         } catch (e) {
-            console.log(e);
-            return res.status(500).json({ message: 'Ошибка при удалении файла. В папке есть файлы' })
+            return res.status(500).json({ message: 'Ошибка при удалении файла. В папке есть файлы', e })
         }
     }
 
@@ -152,8 +148,7 @@ class FileController {
 
             return res.json(files)
         } catch (e) {
-            console.log(e);
-            return res.status(500).json({ message: 'Ошибка при поиске файлов' })
+            return res.status(500).json({ message: 'Ошибка при поиске файлов', e })
         }
     }
 
@@ -169,15 +164,14 @@ class FileController {
                 fs.mkdirSync(pathStatic)
             }
 
-            file.mv(path.resolve(__dirname, "..", 'static', avatarName))
+            file.mv(path.join(pathStatic, avatarName))
 
             user.avatar = avatarName
             await user.save()
 
-            return res.json(user)
+            return res.status(201).json(user)
         } catch (e) {
-            console.log(e);
-            return res.status(500).json({ message: 'Ошибка при загрузке аватара' })
+            return res.status(500).json({ message: 'Ошибка при загрузке аватара', e })
         }
     }
 
@@ -192,8 +186,7 @@ class FileController {
 
             return res.json(user)
         } catch (e) {
-            console.log(e);
-            return res.status(500).json({ message: 'Ошибка при удалении аватара' })
+            return res.status(500).json({ message: 'Ошибка при удалении аватара', e })
         }
     }
 }

@@ -1,6 +1,5 @@
 {
-    "serverPort": "5000",
+    "PORT": "5000",
     "dbUrl": "mongodb+srv://cloud-admin:cloud-password@cloud.cwy5sso.mongodb.net/?retryWrites=true&w=majority",
-    "secretKey": "secret-key",
-    "filePath": "P:\\web\\pet-projects\\react-cloud-storage\\react-cloud-storage-api\\files"
+    "secretKey": "secret-key"
 }

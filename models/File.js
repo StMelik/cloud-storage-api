@@ -10,6 +10,6 @@ const File = new Schema({
     user: { type: ObjectId, ref: 'User' },
     parent: { type: ObjectId, ref: 'File' },
     childs: [{ type: ObjectId, ref: 'File' }],
-})
+}, { versionKey: false })
 
 module.exports = model('File', File)

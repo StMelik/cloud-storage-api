@@ -1,5 +1,4 @@
 const fs = require('fs')
-const File = require('../models/File')
 const path = require('path')
 
 class FileService {
@@ -15,7 +14,7 @@ class FileService {
                     return reject({ message: 'Файл уже существует' })
                 }
             } catch (e) {
-                return reject({ message: 'Ошибка при созданиии папки' })
+                return reject({ message: 'Ошибка при созданиии папки', e })
             }
         })
     }

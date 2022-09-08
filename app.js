@@ -2,14 +2,13 @@ require('dotenv').config();
 const express = require('express')
 const mongoose = require('mongoose')
 const config = require('config')
-const authRouter = require('./routes/auth.routes')
-const filesRouter = require('./routes/file.routes')
+const routes = require('./routes')
 const fileUpload = require('express-fileupload')
 const cors = require('cors')
 const path = require('path')
 const filePath = require('./middlewares/path.middleware')
 
-const PORT = process.env.PORT || config.get('serverPort')
+const PORT = process.env.PORT || config.get('PORT')
 const app = express()
 
 app.use(cors())
@@ -27,10 +26,7 @@ app.use(express.json())
 
 app.use(express.static('static'))
 
-app.use('/', authRouter)
-app.use('/files', filesRouter)
-
-
+app.use(routes)
 
 const start = async () => {
     try {

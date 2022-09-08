@@ -1,9 +1,8 @@
 function filePath(path) {
-    return (req, res, next) => {
+    return (req, _, next) => {
         req.filePath = path
         next()
     }
 }
-
 
 module.exports = filePath
