@@ -130,6 +130,10 @@ class FileController {
                 return res.status(410).json({ message: 'Файл не существует' })
             }
 
+            const user = await User.findById(req.user.id)
+            user.usedSpace -= file.size
+            await user.save()
+
             fileService.deleteFile(req, file)
             await file.remove()
 
