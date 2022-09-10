@@ -24,6 +24,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@architect/sandbox": "^5.3.4",
     "nodemon": "^2.0.19",
     "typescript": "^4.8.2"
   }
